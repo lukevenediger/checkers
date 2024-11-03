@@ -1,0 +1,8 @@
+# Any temporary files
+*.swp
+*.bak
+*.orig
+*.tmp
+*.temp
+
+# Note: proto-generated files are intentionally not ignored

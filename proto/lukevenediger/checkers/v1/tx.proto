@@ -1,0 +1,27 @@
+syntax = "proto3";
+package lukevenediger.checkers.v1;
+
+import "cosmos/msg/v1/msg.proto";
+import "cosmos_proto/cosmos.proto";
+import "gogoproto/gogo.proto";
+import "lukevenediger/checkers/v1/types.proto";
+
+option go_package = "github.com/lukevenediger/checkers";
+
+service CheckersTorram {
+  option (cosmos.msg.v1.service) = true;
+
+  rpc CheckersCreateGm(ReqCheckersTorram) returns (ResCheckersTorram);
+}
+
+message ReqCheckersTorram {
+  option (cosmos.msg.v1.signer) = "creator";
+
+  // Creator is the address of the sender
+  string creator = 1;
+  string index = 2;
+  string black = 3 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  string red = 4 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+}
+
+message ResCheckersTorram {}

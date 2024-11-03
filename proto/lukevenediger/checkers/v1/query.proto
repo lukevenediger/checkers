@@ -1,0 +1,29 @@
+syntax = "proto3";
+package lukevenediger.checkers.v1;
+
+import "cosmos/query/v1/query.proto";
+import "gogoproto/gogo.proto";
+import "google/api/annotations.proto";
+import "lukevenediger/checkers/v1/types.proto";
+
+option go_package = "github.com/lukevenediger/checkers";
+
+service Query {
+  // GetGame returns the game state for a given index
+  rpc GetGame(QueryGetGameRequest) returns (QueryGetGameResponse) {
+    option (cosmos.query.v1.module_query_safe) = true;
+    option (google.api.http).get = "/lukevenediger/checkers/v1/game/{index}";
+  }
+}
+
+// QueryGetGameRequest defines the request type for the Query/GetGame RPC method
+message QueryGetGameRequest {
+  // Index is the unique game state identifier
+  string index = 1;
+}
+
+// QueryGetGameResponse contains the Game state
+message QueryGetGameResponse {
+  // Game is the stored game state
+  StoredGame Game = 1;
+}
