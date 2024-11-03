@@ -1,3 +1,6 @@
+# Mocks generated for testing purposes
+test/mocks
+
 # Any temporary files
 *.swp
 *.bak
