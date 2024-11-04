@@ -142,6 +142,18 @@ func (s *MsgServerTestSuite) TestCheckersCreateGm() {
 			nil,
 			nil,
 		},
+		"fail: cannot play against self": {
+			&checkers.ReqCheckersTorram{
+				Creator: alice,
+				Index:   "game1",
+				Black:   alice,
+				Red:     alice,
+			},
+			nil,
+			"cannot play against self",
+			nil,
+			nil,
+		},
 	}
 
 	for name, tc := range testCases {

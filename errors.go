@@ -11,4 +11,5 @@ var (
 	ErrGameNotParseable             = errors.Register(ModuleName, 7, "game is not parseable")
 	ErrNotPlayersTurn               = errors.Register(ModuleName, 8, "not player's turn")
 	ErrActionNotAllowedForGameState = errors.Register(ModuleName, 9, "action not allowed for game state")
+	ErrCannotPlayAgainstSelf        = errors.Register(ModuleName, 10, "cannot play against self")
 )

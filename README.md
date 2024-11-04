@@ -8,10 +8,6 @@
 
 # TODO List
 
-## Game Rules
-* Ensure a player can't play against themselves
-  * Red and Black wallets must be different
-
 ## Storage improvements
 * use a more optimal data type for storage keys (not strings)
 
@@ -22,4 +18,4 @@
   * such as game ID length out of range
 
 ## CI Improvements
-* Create a base image that can be used for tests - saves downloading all packages on every pipeline run
+* Protect the main branch and disallow direct commits

@@ -60,14 +60,20 @@ func (sg StoredGame) ParseGame() (game *rules.Game, err error) {
 
 // Validate ensures players are valid and game is parseable
 func (sg StoredGame) Validate() (err error) {
-	_, err = sg.GetBlackAddress()
+	bAddr, err := sg.GetBlackAddress()
 	if err != nil {
 		return err
 	}
-	_, err = sg.GetRedAddress()
+	rAddr, err := sg.GetRedAddress()
 	if err != nil {
 		return err
 	}
+
+	// Addresses cannot match
+	if bAddr.Equals(rAddr) {
+		return ErrCannotPlayAgainstSelf
+	}
+
 	_, err = sg.ParseGame()
 	return err
 }
