@@ -20,3 +20,6 @@
 * Add tests for the various validations performed
   * such as dupicate games in genesis
   * such as game ID length out of range
+
+## CI Improvements
+* Create a base image that can be used for tests - saves downloading all packages on every pipeline run
