@@ -38,6 +38,10 @@
   * an empty result is returned if no game is found
   * CLI: $chain_bin query checkers-torram get-game $GAME_ID
 
+# Contributions
+* We'd love to get your contributions
+* Please check out [CONTRIBUTING.md](CONTRIBUTING.md) for more information
+
 # TODO List
 
 ## Storage improvements
