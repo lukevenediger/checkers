@@ -1,5 +1,9 @@
 # Mocks generated for testing purposes
-test/mocks
+util/mocks
+
+# Test and Coverage output
+coverage.out
+test-report.json
 
 # Any temporary files
 *.swp

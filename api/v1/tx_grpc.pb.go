@@ -20,6 +20,7 @@ const _ = grpc.SupportPackageIsVersion7
 
 const (
 	CheckersTorram_CheckersCreateGm_FullMethodName = "/lukevenediger.checkers.v1.CheckersTorram/CheckersCreateGm"
+	CheckersTorram_ForfeitGm_FullMethodName        = "/lukevenediger.checkers.v1.CheckersTorram/ForfeitGm"
 )
 
 // CheckersTorramClient is the client API for CheckersTorram service.
@@ -27,6 +28,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type CheckersTorramClient interface {
 	CheckersCreateGm(ctx context.Context, in *ReqCheckersTorram, opts ...grpc.CallOption) (*ResCheckersTorram, error)
+	ForfeitGm(ctx context.Context, in *ReqForfeitGm, opts ...grpc.CallOption) (*ResForfeitGm, error)
 }
 
 type checkersTorramClient struct {
@@ -46,11 +48,21 @@ func (c *checkersTorramClient) CheckersCreateGm(ctx context.Context, in *ReqChec
 	return out, nil
 }
 
+func (c *checkersTorramClient) ForfeitGm(ctx context.Context, in *ReqForfeitGm, opts ...grpc.CallOption) (*ResForfeitGm, error) {
+	out := new(ResForfeitGm)
+	err := c.cc.Invoke(ctx, CheckersTorram_ForfeitGm_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // CheckersTorramServer is the server API for CheckersTorram service.
 // All implementations must embed UnimplementedCheckersTorramServer
 // for forward compatibility
 type CheckersTorramServer interface {
 	CheckersCreateGm(context.Context, *ReqCheckersTorram) (*ResCheckersTorram, error)
+	ForfeitGm(context.Context, *ReqForfeitGm) (*ResForfeitGm, error)
 	mustEmbedUnimplementedCheckersTorramServer()
 }
 
@@ -60,6 +72,9 @@ type UnimplementedCheckersTorramServer struct {
 
 func (UnimplementedCheckersTorramServer) CheckersCreateGm(context.Context, *ReqCheckersTorram) (*ResCheckersTorram, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CheckersCreateGm not implemented")
+}
+func (UnimplementedCheckersTorramServer) ForfeitGm(context.Context, *ReqForfeitGm) (*ResForfeitGm, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ForfeitGm not implemented")
 }
 func (UnimplementedCheckersTorramServer) mustEmbedUnimplementedCheckersTorramServer() {}
 
@@ -92,6 +107,24 @@ func _CheckersTorram_CheckersCreateGm_Handler(srv interface{}, ctx context.Conte
 	return interceptor(ctx, in, info, handler)
 }
 
+func _CheckersTorram_ForfeitGm_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ReqForfeitGm)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CheckersTorramServer).ForfeitGm(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CheckersTorram_ForfeitGm_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CheckersTorramServer).ForfeitGm(ctx, req.(*ReqForfeitGm))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // CheckersTorram_ServiceDesc is the grpc.ServiceDesc for CheckersTorram service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -102,6 +135,10 @@ var CheckersTorram_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CheckersCreateGm",
 			Handler:    _CheckersTorram_CheckersCreateGm_Handler,
+		},
+		{
+			MethodName: "ForfeitGm",
+			Handler:    _CheckersTorram_ForfeitGm_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

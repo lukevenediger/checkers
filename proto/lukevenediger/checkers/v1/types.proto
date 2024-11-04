@@ -23,8 +23,8 @@ message StoredGame {
   string black = 3 [(cosmos_proto.scalar) = "cosmos.AddressString"];
   string red = 4 [(cosmos_proto.scalar) = "cosmos.AddressString"];
   GameState state = 5;
-  int64 startHeight = 6;
-  int64 lastActionHeight = 7;
+  string startTime = 6;
+  string endTime = 7;
 }
 
 // A stored game identified by an index
@@ -45,4 +45,6 @@ enum GameState {
   GAME_STATE_COMPLETE = 3;
   // The game has expired - no further moves will be accepted
   GAME_STATE_EXPIRED = 4;
+  // The game has been forfeited by one of the players
+  GAME_STATE_FORFEITED = 5;
 }

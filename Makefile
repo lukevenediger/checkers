@@ -6,11 +6,6 @@ DOCKER := $(shell which docker)
 ###   Build   ###
 #################
 
-build:
-	@echo "--> Building"
-	go generate ./...
-	go build -o build/ ./...
-
 test:
 	@echo "--> Running tests"
 	go test -v ./...

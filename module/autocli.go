@@ -20,6 +20,14 @@ func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 						{ProtoField: "red"},
 					},
 				},
+				{
+					RpcMethod: "ForfeitGm",
+					Use:       "forfeit index",
+					Short:     "Forfeits a checkers game at the index. Only the player whose turn it is can forfeit.",
+					PositionalArgs: []*autocliv1.PositionalArgDescriptor{
+						{ProtoField: "index"},
+					},
+				},
 			},
 		},
 		Query: &autocliv1.ServiceCommandDescriptor{

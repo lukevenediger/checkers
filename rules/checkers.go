@@ -2,7 +2,6 @@ package rules
 
 import (
 	"bytes"
-	"errors"
 	"fmt"
 	"strings"
 )
@@ -275,16 +274,16 @@ func (game *Game) Move(src, dst Pos) (captured Pos, err error) {
 	captured = NO_POS
 	err = nil
 	if !game.PieceAt(src) {
-		return NO_POS, errors.New(fmt.Sprintf("No piece at source position: %v", src))
+		return NO_POS, fmt.Errorf("No piece at source position: %v", src)
 	}
 	if game.PieceAt(dst) {
-		return NO_POS, errors.New(fmt.Sprintf("Already piece at destination position: %v", dst))
+		return NO_POS, fmt.Errorf("Already piece at destination position: %v", dst)
 	}
 	if !game.TurnIs(game.Pieces[src].Player) {
-		return NO_POS, errors.New(fmt.Sprintf("Not %v's turn", game.Pieces[src].Player))
+		return NO_POS, fmt.Errorf("Not %v's turn", game.Pieces[src].Player)
 	}
 	if !game.ValidMove(src, dst) {
-		return NO_POS, errors.New(fmt.Sprintf("Invalid move: %v to %v", src, dst))
+		return NO_POS, fmt.Errorf("Invalid move: %v to %v", src, dst)
 	}
 	if game.ValidJump(src, dst) {
 		game.Pieces[dst] = game.Pieces[src]
@@ -330,17 +329,17 @@ func ParsePiece(s string) (Piece, bool) {
 
 func Parse(s string) (*Game, error) {
 	if len(s) != BOARD_DIM*BOARD_DIM+(BOARD_DIM-1) {
-		return nil, errors.New(fmt.Sprintf("invalid board string: %v", s))
+		return nil, fmt.Errorf("invalid board string: %v", s)
 	}
 	pieces := make(map[Pos]Piece)
 	result := &Game{pieces, BLACK_PLAYER}
 	for y, row := range strings.Split(s, ROW_SEP) {
 		for x, c := range strings.Split(row, "") {
 			if x >= BOARD_DIM || y >= BOARD_DIM {
-				return nil, errors.New(fmt.Sprintf("invalid board, piece out of bounds: %v, %v", x, y))
+				return nil, fmt.Errorf("invalid board, piece out of bounds: %v, %v", x, y)
 			}
 			if piece, ok := ParsePiece(c); !ok {
-				return nil, errors.New(fmt.Sprintf("invalid board, invalid piece at %v, %v", x, y))
+				return nil, fmt.Errorf("invalid board, invalid piece at %v, %v", x, y)
 			} else if piece != NO_PIECE {
 				result.Pieces[Pos{x, y}] = piece
 			}

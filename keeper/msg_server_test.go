@@ -1,41 +1,59 @@
 package keeper_test
 
 import (
+	"testing"
+	"time"
+
+	"cosmossdk.io/core/address"
+	"cosmossdk.io/core/store"
+	storetypes "cosmossdk.io/store/types"
+	cmtproto "github.com/cometbft/cometbft/proto/tendermint/types"
+	cmttime "github.com/cometbft/cometbft/types/time"
+	"github.com/cosmos/cosmos-sdk/codec"
+	sdkaddress "github.com/cosmos/cosmos-sdk/codec/address"
+	"github.com/cosmos/cosmos-sdk/runtime"
+	cosmostestutil "github.com/cosmos/cosmos-sdk/testutil"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/lukevenediger/checkers"
+	moduletestutil "github.com/cosmos/cosmos-sdk/types/module/testutil"
+	checkers "github.com/lukevenediger/checkers"
 	"github.com/lukevenediger/checkers/keeper"
-	mock_test "github.com/lukevenediger/checkers/test/mocks"
-	testutil "github.com/lukevenediger/checkers/test/util"
-	"github.com/stretchr/testify/mock"
+	testutil "github.com/lukevenediger/checkers/util/test"
 	"github.com/stretchr/testify/suite"
 )
+
+// Make sure that KeeperTestSuite implements the SetupTestSuite interface
+var _ suite.SetupTestSuite = (*KeeperTestSuite)(nil)
 
 // TODO: move this to common_test.go
 type KeeperTestSuite struct {
 	suite.Suite
 	ctx          sdk.Context
 	keeper       keeper.Keeper
-	binaryCodec  mock_test.BinaryCodec
-	addressCodec mock_test.Codec
-	storeService mock_test.KVStoreService
-	store        mock_test.KVStore
+	cdc          codec.BinaryCodec
+	addressCodec address.Codec
+	storeService store.KVStoreService
+}
+
+func TestMsgServerTestSuite(t *testing.T) {
+	suite.Run(t, new(MsgServerTestSuite))
 }
 
 func (s *KeeperTestSuite) SetupTest() {
 	_, addrs := testutil.PrivKeyAddressPairs(1)
 	authority := addrs[0].String()
 
-	s.binaryCodec = mock_test.BinaryCodec{}
-	s.addressCodec = mock_test.Codec{}
-	s.storeService = mock_test.KVStoreService{}
-	s.store = mock_test.KVStore{}
+	key := storetypes.NewKVStoreKey(checkers.StoreKey)
+	s.storeService = runtime.NewKVStoreService(key)
+	testCtx := cosmostestutil.DefaultContextWithDB(s.T(), key, storetypes.NewTransientStoreKey("transient_test"))
+	s.ctx = testCtx.Ctx.WithBlockHeader(cmtproto.Header{Time: cmttime.Now()})
+	s.addressCodec = sdkaddress.NewBech32Codec("cosmos")
+	encCfg := moduletestutil.MakeTestEncodingConfig()
+	s.cdc = encCfg.Codec
 
 	// Default optional expectations
-	s.storeService.EXPECT().OpenKVStore(mock.Anything).Return(&s.store).Maybe()
-
-	s.keeper = keeper.NewKeeper(&s.binaryCodec,
-		&s.addressCodec,
-		&s.storeService,
+	s.keeper = keeper.NewKeeper(s.cdc,
+		s.addressCodec,
+		s.storeService,
 		authority,
 	)
 }
@@ -52,20 +70,18 @@ func (s *MsgServerTestSuite) SetupTest() {
 
 func (s *MsgServerTestSuite) TestCheckersCreateGm() {
 
-	_, addrs := testutil.PrivKeyAddressPairs(3)
+	_, addrs := testutil.PrivKeyAddressPairs(2)
 	alice := addrs[0].String()
 	bob := addrs[1].String()
-	// eve := addrs[2].String()
 
-	testCases := []struct {
-		name    string
-		reqMsg  *checkers.ReqCheckersTorram
-		resMsg  *checkers.ResCheckersTorram
-		wantErr string
-		preHook func(ss *MsgServerTestSuite)
+	testCases := map[string]struct {
+		reqMsg   *checkers.ReqCheckersTorram
+		resMsg   *checkers.ResCheckersTorram
+		wantErr  string
+		preHook  func(ss *MsgServerTestSuite) error
+		postHook func(ss *MsgServerTestSuite) error
 	}{
-		{
-			"success",
+		"success": {
 			&checkers.ReqCheckersTorram{
 				Creator: alice,
 				Index:   "game1",
@@ -75,9 +91,20 @@ func (s *MsgServerTestSuite) TestCheckersCreateGm() {
 			&checkers.ResCheckersTorram{},
 			"",
 			nil,
+			func(ss *MsgServerTestSuite) error {
+				// Check game state is Ready
+				game, err := ss.keeper.StoredGames.Get(ss.ctx, "game1")
+				if err != nil {
+					return err
+				}
+				ss.Require().NotNil(game)
+				ss.Require().NotEmpty(game.StartTime)
+				ss.Require().Empty(game.EndTime)
+				ss.Require().Equal(checkers.GameState_GAME_STATE_READY, game.State)
+				return nil
+			},
 		},
-		{
-			"fail: game already exists",
+		"fail: game already exists": {
 			&checkers.ReqCheckersTorram{
 				Creator: alice,
 				Index:   "game1",
@@ -85,18 +112,46 @@ func (s *MsgServerTestSuite) TestCheckersCreateGm() {
 				Red:     bob,
 			},
 			nil,
-			"game already exists at index game1",
-			func(ss *MsgServerTestSuite) {
-				s.store.EXPECT().Get([]byte("game1")).Return([]byte{}, nil)
+			"duplicate game index",
+			func(ss *MsgServerTestSuite) error {
+				return ss.keeper.StoredGames.Set(ss.ctx, "game1", checkers.StoredGame{})
 			},
+			nil,
+		},
+		"fail: index too long": {
+			&checkers.ReqCheckersTorram{
+				Creator: alice,
+				Index:   testutil.RandLetters(checkers.MaxIndexLength + 1),
+				Black:   alice,
+				Red:     bob,
+			},
+			nil,
+			"index too long",
+			nil,
+			nil,
+		},
+		"fail: empty index": {
+			&checkers.ReqCheckersTorram{
+				Creator: alice,
+				Index:   "",
+				Black:   alice,
+				Red:     bob,
+			},
+			nil,
+			"empty index not allowed",
+			nil,
+			nil,
 		},
 	}
 
-	for _, tc := range testCases {
-		s.Run(tc.name, func() {
+	for name, tc := range testCases {
+		s.Run(name, func() {
 			s.SetupTest()
 			if tc.preHook != nil {
-				tc.preHook(s)
+				err := tc.preHook(s)
+				if err != nil {
+					s.Failf("preHook failed: %v", err.Error())
+				}
 			}
 
 			resp, err := s.msgServer.CheckersCreateGm(s.ctx, tc.reqMsg)
@@ -112,11 +167,110 @@ func (s *MsgServerTestSuite) TestCheckersCreateGm() {
 			// Compare the response
 			s.Equal(tc.resMsg, resp)
 
-			// Validate all expectations
-			s.binaryCodec.AssertExpectations(s.T())
-			s.addressCodec.AssertExpectations(s.T())
-			s.storeService.AssertExpectations(s.T())
-			s.store.AssertExpectations(s.T())
+			// Execute post hook
+			if tc.postHook != nil {
+				err := tc.postHook(s)
+				if err != nil {
+					s.Failf("postHook failed: %v", err.Error())
+				}
+			}
+		})
+	}
+}
+
+func (s *MsgServerTestSuite) TestForfeitGm() {
+
+	_, addrs := testutil.PrivKeyAddressPairs(3)
+	alice := addrs[0].String()
+	bob := addrs[1].String()
+
+	testCases := map[string]struct {
+		reqMsg   *checkers.ReqForfeitGm
+		resMsg   *checkers.ResForfeitGm
+		wantErr  string
+		preHook  func(ss *MsgServerTestSuite) error
+		postHook func(ss *MsgServerTestSuite) error
+	}{
+		"success": {
+			&checkers.ReqForfeitGm{
+				Forfeiter: alice,
+				Index:     "game1",
+			},
+			&checkers.ResForfeitGm{},
+			"",
+			func(ss *MsgServerTestSuite) error {
+				game := checkers.NewStoredGame(alice, bob, time.Now())
+				return ss.keeper.StoredGames.Set(ss.ctx, "game1", game)
+			},
+			func(ss *MsgServerTestSuite) error {
+				// Check game state is Ready
+				game, err := ss.keeper.StoredGames.Get(ss.ctx, "game1")
+				if err != nil {
+					return err
+				}
+				ss.Require().NotNil(game)
+				ss.Require().NotEmpty(game.StartTime)
+				ss.Require().NotEmpty(game.EndTime)
+				ss.Require().Equal(checkers.GameState_GAME_STATE_FORFEITED, game.State)
+				return nil
+			},
+		},
+		"not player's turn": {
+			&checkers.ReqForfeitGm{
+				Forfeiter: bob,
+				Index:     "game1",
+			},
+			nil,
+			"not player's turn",
+			func(ss *MsgServerTestSuite) error {
+				game := checkers.NewStoredGame(alice, bob, time.Now())
+				return ss.keeper.StoredGames.Set(ss.ctx, "game1", game)
+			},
+			nil,
+		},
+		"game not found": {
+			&checkers.ReqForfeitGm{
+				Forfeiter: alice,
+				Index:     "game1",
+			},
+			nil,
+			"not found: key 'game1'",
+			nil,
+			nil,
+		},
+	}
+
+	for name, tc := range testCases {
+		s.Run(name, func() {
+			s.SetupTest()
+			if tc.preHook != nil {
+				err := tc.preHook(s)
+				if err != nil {
+					s.Failf("preHook failed: %v", err.Error())
+				}
+			}
+
+			resp, err := s.msgServer.ForfeitGm(s.ctx, tc.reqMsg)
+
+			if tc.wantErr != "" {
+				s.Error(err)
+				s.ErrorContains(err, tc.wantErr)
+				return
+			}
+
+			s.NoError(err)
+
+			// Compare the response
+			s.Equal(tc.resMsg, resp)
+
+			// Execute post hook
+			if tc.postHook != nil {
+				err := tc.postHook(s)
+				if err != nil {
+					s.Failf("postHook failed: %v", err.Error())
+				}
+			}
+
 		})
 	}
 }

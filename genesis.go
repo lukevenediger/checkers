@@ -24,7 +24,7 @@ func (gs *GenesisState) Validate() error {
 		}
 		// Cannot have multiple games with the same index
 		if _, ok := unique[indexedStoredGame.Index]; ok {
-			return ErrDuplicateAddress
+			return ErrDuplicateGameIndex
 		}
 		// Stored game must be valid
 		if err := indexedStoredGame.StoredGame.Validate(); err != nil {

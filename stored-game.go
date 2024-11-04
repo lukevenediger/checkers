@@ -1,12 +1,26 @@
 package checkers
 
 import (
-	fmt "fmt"
+	"time"
 
 	"cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/lukevenediger/checkers/rules"
 )
+
+// NewStoredGame creates a new stored game with a fresh board
+func NewStoredGame(black, red string, startTime time.Time) StoredGame {
+	newBoard := rules.New()
+	return StoredGame{
+		Board:     newBoard.String(),
+		Turn:      rules.PieceStrings[newBoard.Turn],
+		Black:     black,
+		Red:       red,
+		StartTime: startTime.UTC().Format(GameTimeLayout),
+		EndTime:   "",
+		State:     GameState_GAME_STATE_READY,
+	}
+}
 
 // GetBlackAddress validates and returns the black player's address
 func (sg StoredGame) GetBlackAddress() (black sdk.AccAddress, err error) {
@@ -17,7 +31,18 @@ func (sg StoredGame) GetBlackAddress() (black sdk.AccAddress, err error) {
 // GetRedAddress validates and returns the red player's address
 func (sg StoredGame) GetRedAddress() (red sdk.AccAddress, err error) {
 	red, parseErr := sdk.AccAddressFromBech32(sg.Red)
-	return red, errors.Wrapf(parseErr, ErrInvalidBlack.Error(), sg.Red)
+	return red, errors.Wrapf(parseErr, ErrInvalidRed.Error(), sg.Red)
+}
+
+func (sg StoredGame) GetTurnAddress() (turn sdk.AccAddress, err error) {
+	player := rules.StringPieces[sg.Turn].Player
+	if player == rules.RED_PLAYER {
+		return sg.GetRedAddress()
+	} else if player == rules.BLACK_PLAYER {
+		return sg.GetBlackAddress()
+	} else {
+		return nil, errors.Wrapf(ErrGameNotParseable, "invalid turn: %s", sg.Turn)
+	}
 }
 
 // ParseGame returns an active checkers game
@@ -28,7 +53,7 @@ func (sg StoredGame) ParseGame() (game *rules.Game, err error) {
 	}
 	board.Turn = rules.StringPieces[sg.Turn].Player
 	if board.Turn.Color == "" {
-		return nil, errors.Wrapf(fmt.Errorf("turn: %s", sg.Turn), ErrGameNotParseable.Error())
+		return nil, errors.Wrapf(ErrGameNotParseable, "invalid turn: %s", sg.Turn)
 	}
 	return board, nil
 }
@@ -45,4 +70,14 @@ func (sg StoredGame) Validate() (err error) {
 	}
 	_, err = sg.ParseGame()
 	return err
+}
+
+func (sg *StoredGame) EndGame(endTime time.Time, state GameState) {
+	sg.State = state
+	sg.EndTime = endTime.UTC().Format(GameTimeLayout)
+}
+
+func (sg *StoredGame) IsReadyOrInProgress() bool {
+	return sg.State == GameState_GAME_STATE_READY ||
+		sg.State == GameState_GAME_STATE_PLAYING
 }

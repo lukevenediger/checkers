@@ -12,6 +12,7 @@ service CheckersTorram {
   option (cosmos.msg.v1.service) = true;
 
   rpc CheckersCreateGm(ReqCheckersTorram) returns (ResCheckersTorram);
+  rpc ForfeitGm(ReqForfeitGm) returns (ResForfeitGm);
 }
 
 message ReqCheckersTorram {
@@ -25,3 +26,13 @@ message ReqCheckersTorram {
 }
 
 message ResCheckersTorram {}
+
+message ReqForfeitGm {
+  option (cosmos.msg.v1.signer) = "forfeiter";
+
+  // Forfeiter is the address of the sender
+  string forfeiter = 1;
+  string index = 2;
+}
+
+message ResForfeitGm {}
