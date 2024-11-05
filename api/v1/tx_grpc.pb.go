@@ -27,7 +27,9 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type CheckersTorramClient interface {
+	// CheckersCreateGm creates a new game
 	CheckersCreateGm(ctx context.Context, in *ReqCheckersTorram, opts ...grpc.CallOption) (*ResCheckersTorram, error)
+	// ForfeitGm forfeits an incomplete game
 	ForfeitGm(ctx context.Context, in *ReqForfeitGm, opts ...grpc.CallOption) (*ResForfeitGm, error)
 }
 
@@ -61,7 +63,9 @@ func (c *checkersTorramClient) ForfeitGm(ctx context.Context, in *ReqForfeitGm, 
 // All implementations must embed UnimplementedCheckersTorramServer
 // for forward compatibility
 type CheckersTorramServer interface {
+	// CheckersCreateGm creates a new game
 	CheckersCreateGm(context.Context, *ReqCheckersTorram) (*ResCheckersTorram, error)
+	// ForfeitGm forfeits an incomplete game
 	ForfeitGm(context.Context, *ReqForfeitGm) (*ResForfeitGm, error)
 	mustEmbedUnimplementedCheckersTorramServer()
 }

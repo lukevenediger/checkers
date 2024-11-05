@@ -8,6 +8,7 @@ import "lukevenediger/checkers/v1/types.proto";
 
 option go_package = "github.com/lukevenediger/checkers";
 
+// Query defines the gRPC query service for the checkers module
 service Query {
   // GetGame returns the game state for a given index
   rpc GetGame(QueryGetGameRequest) returns (QueryGetGameResponse) {

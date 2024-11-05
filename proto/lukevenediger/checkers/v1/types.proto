@@ -16,20 +16,29 @@ message GenesisState {
   repeated IndexedStoredGame indexedStoredGameList = 2 [(gogoproto.nullable) = false];
 }
 
-// State of play for a single game
+// StoredGame is the state of play for a single game
 message StoredGame {
+  // Board is the serialized current state of the game board
   string board = 1;
+  // Turn is the player whose turn it is
   string turn = 2;
+  // Black is the address of the black player
   string black = 3 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  // Red is the address of the red player
   string red = 4 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  // State is the current state of the game
   GameState state = 5;
+  // StartTime is the time the game started in UTC
   string startTime = 6;
+  // EndTime is the time the game ended in UTC
   string endTime = 7;
 }
 
 // A stored game identified by an index
 message IndexedStoredGame {
+  // Index is the unique game state identifier
   string index = 1;
+  // StoredGame is the stored game state
   StoredGame storedGame = 2 [(gogoproto.nullable) = false];
 }
 

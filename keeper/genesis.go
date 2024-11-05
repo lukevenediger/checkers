@@ -25,6 +25,7 @@ func (k *Keeper) InitGenesis(
 	return nil
 }
 
+// ExportGenesis exports the model to genesis state
 func (k *Keeper) ExportGenesis(
 	ctx context.Context,
 ) (*checkers.GenesisState, error) {

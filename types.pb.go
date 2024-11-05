@@ -158,15 +158,22 @@ func (m *GenesisState) GetIndexedStoredGameList() []IndexedStoredGame {
 	return nil
 }
 
-// State of play for a single game
+// StoredGame is the state of play for a single game
 type StoredGame struct {
-	Board     string    `protobuf:"bytes,1,opt,name=board,proto3" json:"board,omitempty"`
-	Turn      string    `protobuf:"bytes,2,opt,name=turn,proto3" json:"turn,omitempty"`
-	Black     string    `protobuf:"bytes,3,opt,name=black,proto3" json:"black,omitempty"`
-	Red       string    `protobuf:"bytes,4,opt,name=red,proto3" json:"red,omitempty"`
-	State     GameState `protobuf:"varint,5,opt,name=state,proto3,enum=lukevenediger.checkers.v1.GameState" json:"state,omitempty"`
-	StartTime string    `protobuf:"bytes,6,opt,name=startTime,proto3" json:"startTime,omitempty"`
-	EndTime   string    `protobuf:"bytes,7,opt,name=endTime,proto3" json:"endTime,omitempty"`
+	// Board is the serialized current state of the game board
+	Board string `protobuf:"bytes,1,opt,name=board,proto3" json:"board,omitempty"`
+	// Turn is the player whose turn it is
+	Turn string `protobuf:"bytes,2,opt,name=turn,proto3" json:"turn,omitempty"`
+	// Black is the address of the black player
+	Black string `protobuf:"bytes,3,opt,name=black,proto3" json:"black,omitempty"`
+	// Red is the address of the red player
+	Red string `protobuf:"bytes,4,opt,name=red,proto3" json:"red,omitempty"`
+	// State is the current state of the game
+	State GameState `protobuf:"varint,5,opt,name=state,proto3,enum=lukevenediger.checkers.v1.GameState" json:"state,omitempty"`
+	// StartTime is the time the game started in UTC
+	StartTime string `protobuf:"bytes,6,opt,name=startTime,proto3" json:"startTime,omitempty"`
+	// EndTime is the time the game ended in UTC
+	EndTime string `protobuf:"bytes,7,opt,name=endTime,proto3" json:"endTime,omitempty"`
 }
 
 func (m *StoredGame) Reset()         { *m = StoredGame{} }
@@ -253,7 +260,9 @@ func (m *StoredGame) GetEndTime() string {
 
 // A stored game identified by an index
 type IndexedStoredGame struct {
-	Index      string     `protobuf:"bytes,1,opt,name=index,proto3" json:"index,omitempty"`
+	// Index is the unique game state identifier
+	Index string `protobuf:"bytes,1,opt,name=index,proto3" json:"index,omitempty"`
+	// StoredGame is the stored game state
 	StoredGame StoredGame `protobuf:"bytes,2,opt,name=storedGame,proto3" json:"storedGame"`
 }
 

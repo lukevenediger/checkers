@@ -1,29 +1,45 @@
 # Contribution Guidelines
-* we welcome all contributions to this project
-* please use the information below to help configure your local development environment
+
+We welcome all contributions to this project. Please use the guidelines below to set up your development environment.
+
+## Prerequisites
+
+The following tools are required to contribute to this project:
+
+* [Go](https://golang.org/dl/)
+* [Docker](https://docs.docker.com/get-docker/)
+* [pre-commit](https://pre-commit.com/)
+* [make](https://www.gnu.org/software/make/)
 
 ## Pre-Commit Hooks
-* We use pre-commit hooks to perform the following actions:
-  * format all go files with `go fmt`
-  * fix trailing whitespace
-  * standardise EOF newlines for all files
-  * enforce the Conventional Commit message standard
+
+Our pre-commit hooks help maintain code quality and consistency by performing the following actions:
+* Formatting all Go files with `go fmt`.
+* Removing trailing whitespace.
+* Standardizing end-of-file (EOF) newlines.
+* Enforcing the Conventional Commit message standard.
 
 ### Conventional Commit Messages
-* This tool enables a lightweight way to document each commit message
-* The format for a commit message is typically `<type>(<scope>): <description>`
-  * where type is `feat`, `fix`, `docs`, `style`, `refactor`, `test`, or `chore`
-* read more about the message format in the [Conventional Commits Quickstart Guide](https://www.conventionalcommits.org/en/v1.0.0/#summary)
+
+We follow a lightweight structure for commit messages using the Conventional Commits standard. The format is `<type>(<scope>): <description>`, where `type` can be one of `feat`, `fix`, `docs`, `style`, `refactor`, `test`, or `chore`.
+
+For more details, see the [Conventional Commits Quickstart Guide](https://www.conventionalcommits.org/en/v1.0.0/#summary).
 
 ### Installing Pre-Commit
-* First you must install [pre-commit](https://pre-commit.com/)
-* Then apply the pre-commit and pre-commit-msg hooks for this repo
-  * `pre-commit install`
-  * `pre-commit install --hook-type commit-msg`
+
+1. Install [pre-commit](https://pre-commit.com/).
+2. Apply the pre-commit and commit message hooks to this repository:
+   ```sh
+   pre-commit install
+   pre-commit install --hook-type commit-msg
+   ```
 
 # Working with Protobuf and gRPC
-* All RPC services and messages are defined in `proto/lukevenediger/checkers/`
-* Regenerate the gRPC code after making changes by running
-  * `make proto-gen`
-* Please ensure that docker is installed and running
-    * The protoc compiler runs in a docker container to ensure consistent results
+All RPC services and messages are defined in `proto/lukevenediger/checkers/` and used as part of the gRPC implementation.
+Please ensure that docker is installed and running. The protoc compiler runs in a docker container to ensure consistent results
+
+Regenerate the gRPC code after making changes by running:
+
+```sh
+make proto-gen
+```

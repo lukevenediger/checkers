@@ -30,12 +30,16 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
+// ReqCheckersTorram defines the CheckersTorram/CreateGm request type
 type ReqCheckersTorram struct {
 	// Creator is the address of the sender
 	Creator string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
-	Index   string `protobuf:"bytes,2,opt,name=index,proto3" json:"index,omitempty"`
-	Black   string `protobuf:"bytes,3,opt,name=black,proto3" json:"black,omitempty"`
-	Red     string `protobuf:"bytes,4,opt,name=red,proto3" json:"red,omitempty"`
+	// Index is the unique game state identifier
+	Index string `protobuf:"bytes,2,opt,name=index,proto3" json:"index,omitempty"`
+	// Black is the address of the black player
+	Black string `protobuf:"bytes,3,opt,name=black,proto3" json:"black,omitempty"`
+	// Red is the address of the red player
+	Red string `protobuf:"bytes,4,opt,name=red,proto3" json:"red,omitempty"`
 }
 
 func (m *ReqCheckersTorram) Reset()         { *m = ReqCheckersTorram{} }
@@ -99,6 +103,7 @@ func (m *ReqCheckersTorram) GetRed() string {
 	return ""
 }
 
+// ResCheckersTorram defines the CheckersTorram/CreateGm response type
 type ResCheckersTorram struct {
 }
 
@@ -135,10 +140,12 @@ func (m *ResCheckersTorram) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_ResCheckersTorram proto.InternalMessageInfo
 
+// ReqForfeitGm defines the CheckersTorram/ForfeitGm request type
 type ReqForfeitGm struct {
 	// Forfeiter is the address of the sender
 	Forfeiter string `protobuf:"bytes,1,opt,name=forfeiter,proto3" json:"forfeiter,omitempty"`
-	Index     string `protobuf:"bytes,2,opt,name=index,proto3" json:"index,omitempty"`
+	// Index is the unique game state identifier
+	Index string `protobuf:"bytes,2,opt,name=index,proto3" json:"index,omitempty"`
 }
 
 func (m *ReqForfeitGm) Reset()         { *m = ReqForfeitGm{} }
@@ -188,6 +195,7 @@ func (m *ReqForfeitGm) GetIndex() string {
 	return ""
 }
 
+// ResForfeitGm defines the CheckersTorram/ForfeitGm response type
 type ResForfeitGm struct {
 }
 
@@ -276,7 +284,9 @@ const _ = grpc.SupportPackageIsVersion4
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type CheckersTorramClient interface {
+	// CheckersCreateGm creates a new game
 	CheckersCreateGm(ctx context.Context, in *ReqCheckersTorram, opts ...grpc.CallOption) (*ResCheckersTorram, error)
+	// ForfeitGm forfeits an incomplete game
 	ForfeitGm(ctx context.Context, in *ReqForfeitGm, opts ...grpc.CallOption) (*ResForfeitGm, error)
 }
 
@@ -308,7 +318,9 @@ func (c *checkersTorramClient) ForfeitGm(ctx context.Context, in *ReqForfeitGm, 
 
 // CheckersTorramServer is the server API for CheckersTorram service.
 type CheckersTorramServer interface {
+	// CheckersCreateGm creates a new game
 	CheckersCreateGm(context.Context, *ReqCheckersTorram) (*ResCheckersTorram, error)
+	// ForfeitGm forfeits an incomplete game
 	ForfeitGm(context.Context, *ReqForfeitGm) (*ResForfeitGm, error)
 }
 

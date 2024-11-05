@@ -10,6 +10,7 @@ import (
 	checkers "github.com/lukevenediger/checkers"
 )
 
+// Keeper defines the Checkers module's keeper
 type Keeper struct {
 	cdc          codec.BinaryCodec
 	addressCodec address.Codec

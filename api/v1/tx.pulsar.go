@@ -1836,6 +1836,7 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+// ReqCheckersTorram defines the CheckersTorram/CreateGm request type
 type ReqCheckersTorram struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -1843,9 +1844,12 @@ type ReqCheckersTorram struct {
 
 	// Creator is the address of the sender
 	Creator string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
-	Index   string `protobuf:"bytes,2,opt,name=index,proto3" json:"index,omitempty"`
-	Black   string `protobuf:"bytes,3,opt,name=black,proto3" json:"black,omitempty"`
-	Red     string `protobuf:"bytes,4,opt,name=red,proto3" json:"red,omitempty"`
+	// Index is the unique game state identifier
+	Index string `protobuf:"bytes,2,opt,name=index,proto3" json:"index,omitempty"`
+	// Black is the address of the black player
+	Black string `protobuf:"bytes,3,opt,name=black,proto3" json:"black,omitempty"`
+	// Red is the address of the red player
+	Red string `protobuf:"bytes,4,opt,name=red,proto3" json:"red,omitempty"`
 }
 
 func (x *ReqCheckersTorram) Reset() {
@@ -1896,6 +1900,7 @@ func (x *ReqCheckersTorram) GetRed() string {
 	return ""
 }
 
+// ResCheckersTorram defines the CheckersTorram/CreateGm response type
 type ResCheckersTorram struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -1922,6 +1927,7 @@ func (*ResCheckersTorram) Descriptor() ([]byte, []int) {
 	return file_lukevenediger_checkers_v1_tx_proto_rawDescGZIP(), []int{1}
 }
 
+// ReqForfeitGm defines the CheckersTorram/ForfeitGm request type
 type ReqForfeitGm struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -1929,7 +1935,8 @@ type ReqForfeitGm struct {
 
 	// Forfeiter is the address of the sender
 	Forfeiter string `protobuf:"bytes,1,opt,name=forfeiter,proto3" json:"forfeiter,omitempty"`
-	Index     string `protobuf:"bytes,2,opt,name=index,proto3" json:"index,omitempty"`
+	// Index is the unique game state identifier
+	Index string `protobuf:"bytes,2,opt,name=index,proto3" json:"index,omitempty"`
 }
 
 func (x *ReqForfeitGm) Reset() {
@@ -1966,6 +1973,7 @@ func (x *ReqForfeitGm) GetIndex() string {
 	return ""
 }
 
+// ResForfeitGm defines the CheckersTorram/ForfeitGm response type
 type ResForfeitGm struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache

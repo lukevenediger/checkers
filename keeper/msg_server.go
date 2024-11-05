@@ -20,6 +20,7 @@ func NewMsgServerImpl(keeper Keeper) checkers.CheckersTorramServer {
 	}
 }
 
+// CheckersCreateGm creates a new checkers game
 func (ms checkersTorramServer) CheckersCreateGm(
 	goCtx context.Context,
 	msg *checkers.ReqCheckersTorram,
@@ -60,6 +61,7 @@ func (ms checkersTorramServer) CheckersCreateGm(
 	return &checkers.ResCheckersTorram{}, nil
 }
 
+// ForfeitGm forfeits an incomplete game
 func (ms checkersTorramServer) ForfeitGm(
 	goCtx context.Context,
 	msg *checkers.ReqForfeitGm,

@@ -23,6 +23,7 @@ type queryServer struct {
 	k Keeper
 }
 
+// GetGame returns a game by index
 func (qs queryServer) GetGame(
 	ctx context.Context,
 	req *checkers.QueryGetGameRequest,
