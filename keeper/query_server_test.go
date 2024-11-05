@@ -33,10 +33,11 @@ func (s *QueryServerTestSuite) TestGetGame() {
 	referenceGame := checkers.NewStoredGame("alice", "bob", time.Now())
 
 	testCases := map[string]struct {
-		reqMsg  *checkers.QueryGetGameRequest
-		resMsg  *checkers.QueryGetGameResponse
-		wantErr string
-		preHook func(ss *QueryServerTestSuite) error
+		reqMsg   *checkers.QueryGetGameRequest
+		resMsg   *checkers.QueryGetGameResponse
+		wantErr  string
+		preHook  func(ss *QueryServerTestSuite) error
+		postHook func(ss *QueryServerTestSuite) error
 	}{
 		"success": {
 			&checkers.QueryGetGameRequest{
@@ -53,6 +54,9 @@ func (s *QueryServerTestSuite) TestGetGame() {
 					referenceGame,
 				)
 			},
+			func(ss *QueryServerTestSuite) error {
+				return ss.keeper.StoredGames.Remove(ss.ctx, "game1")
+			},
 		},
 		"not found": {
 			&checkers.QueryGetGameRequest{
@@ -60,6 +64,7 @@ func (s *QueryServerTestSuite) TestGetGame() {
 			},
 			&checkers.QueryGetGameResponse{},
 			"",
+			nil,
 			nil,
 		},
 	}
@@ -85,6 +90,12 @@ func (s *QueryServerTestSuite) TestGetGame() {
 
 			s.Require().NoError(err)
 			s.Require().Equal(tc.resMsg, res)
+
+			// Run the postHook if there is one
+			if tc.postHook != nil {
+				err := tc.postHook(s)
+				s.Require().NoError(err)
+			}
 		})
 	}
 }
